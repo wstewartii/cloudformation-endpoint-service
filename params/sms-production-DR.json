@@ -1,0 +1,34 @@
+[
+  {
+    "ParameterKey": "AWSPrincipals",
+    "ParameterValue": "arn:aws:iam::255454133630:root,arn:aws:iam::534398462949:root"
+  },
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "sms-production-DR"
+  },
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-0368878a018165428"
+  },
+  {
+    "ParameterKey": "subnetAZ3",
+    "ParameterValue": "subnet-0b27401ae3f15d55a"
+  },
+  {
+    "ParameterKey": "subnetAZ1",
+    "ParameterValue": "subnet-0db830bb8003b2044"
+  },
+  {
+    "ParameterKey": "subnetAZ2",
+    "ParameterValue": "subnet-0438eb616df8c4a9a"
+  },
+  {
+    "ParameterKey": "TgIp1",
+    "ParameterValue": "192.171.186.184"
+  },
+  {
+    "ParameterKey": "TgIp2",
+    "ParameterValue": "192.171.213.152"
+  }
+]

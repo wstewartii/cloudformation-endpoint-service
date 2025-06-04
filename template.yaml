@@ -1,0 +1,93 @@
+Parameters:
+  AWSPrincipals:
+    Description: Comma separated list of IAM users, IAM roles, or AWS accounts allowed access to the VPCEndpointService
+    Type: CommaDelimitedList
+  Environment:
+    Description: The Name of the environment
+    Type: String
+  VpcId:
+    Description: The ID of the VPC
+    Type: String
+  subnetAZ1:
+    Description: The subnet ID for AZ1
+    Type: String
+  subnetAZ2:
+    Description: The subnet ID for AZ2
+    Type: String
+  subnetAZ3:
+    Description: The subnet ID for AZ3
+    Type: String
+  TgIp1:
+    Description: The first ip address of the targetgroup
+    Type: String
+  TgIp2:
+    Description: The second ip address of the targetgroup
+    Type: String
+Resources:
+  eksLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: 
+        Fn::Join:
+          - "-"
+          - 
+            - !Ref Environment
+            - "kubectl"
+      Type: network
+      Scheme: internal
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: true
+      Subnets: 
+        - !Ref subnetAZ1
+        - !Ref subnetAZ2
+        - !Ref subnetAZ3
+
+  eksTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name:
+        Fn::Join:
+          - "-"
+          - 
+            - !Ref Environment
+            - "kubectl"
+      TargetType: ip
+      Protocol: TCP
+      Port: 443
+      VpcId: !Ref VpcId  # Replace with your VPC ID
+      Targets:
+        - Id: !Ref TgIp1  # Replace with your IP address
+          Port: 443
+        - Id: !Ref TgIp2  # Replace with another IP address
+          Port: 443
+
+  eksTCPlistener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      LoadBalancerArn: !Ref eksLoadBalancer
+      Protocol: "TCP"
+      Port: 443
+      DefaultActions:
+        - Type: "forward"
+          TargetGroupArn: !Ref eksTargetGroup
+  VPCEndpointService:
+    Type: AWS::EC2::VPCEndpointService
+    Properties: 
+      AcceptanceRequired: true
+      NetworkLoadBalancerArns: 
+        - !Ref eksLoadBalancer
+      Tags:
+        - Key: "Name"
+          Value:
+            Fn::Join:
+              - "-"
+              - 
+                - !Ref Environment
+                - "kubectl"
+  VPCEndpointServicePermissions:
+    Type: AWS::EC2::VPCEndpointServicePermissions
+    Properties:
+      AllowedPrincipals: !Ref AWSPrincipals
+      ServiceId: !Ref VPCEndpointService
+
